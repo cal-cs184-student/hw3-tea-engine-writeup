@@ -62,7 +62,6 @@
 
 		To test sphere intersection we follow a similar process with substituting r(t) into the point of an equation describing a sphere. This gives us a quadratic to solve, upon solving we choose the intersection with the smaller t value indicating that it was the one that hit the sphere first.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
@@ -187,21 +186,30 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h2>Part 5: Adaptive Sampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		Adaptive sampling is a way to reduce the amount of rays needed in order to render a good image. It uses the principle that some pixels can converge very quickly to the correct color, while others might take a lot more samples if they are part of more complex geometry. Thus, it measures the variance of the samples taken so far and terminates the sampling early if it deems that the noise/variance is low enough. Our implementation achieves this by storing a cumulative sum so far (and its square) to be used in the variance calculations. We check the variance using our sums and the formula every samplesPerBatch to avoid having to do these calculations every single color update. We break out of the loop if the desired confidence interval is reached, or we terminate the loop once ns_aa (max number of samples) is reached.
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_blob.png" width="400px"/>
+				  <figcaption>Blob with Adaptive Sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_blob_rate.png" width="400px"/>
+				  <figcaption>Sampling Rate of Blob</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_bench.png" width="400px"/>
+				  <figcaption>Bench with Adaptive Sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_bench_rate.png" width="400px"/>
+				  <figcaption>Sampling Rate of Bench</figcaption>
+				</td>
+			  </tr>
+			</table>
+	
 		</div>
 	</body>
 </html>
