@@ -67,22 +67,16 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="assets/cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="assets/pt1_dragon.png" width="400px"/>
+				  <figcaption>DRAGON NORMAL SHADING</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="assets/cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="assets/pt1_spheres.png" width="400px"/>
+				  <figcaption>SPHERES NORMAL SHADING</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="assets/pt1_bench.png" width="400px"/>
+				  <figcaption>BENCH NORMAL SHADING</figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -107,8 +101,71 @@ Our performance comparison shows a massive difference between using and not usin
 </p>
 
 		<h2>Part 3: Direct Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p>
+		For this part, we had to implement two different versions of the direct lighting function, specifically uniform hemisphere sampling and importance sampling. Both methods aim to provide path tracing with one bounce illumination by providing shading to a pixel where a camera's ray has intersected a primitive. The method in which we perform this is by tracking inverse rays where we fire the rays from the camera and when they intersect with a primitive we determine its shading via the rendering equation (instead of tracking light coming from the light sources): 
+		</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/CBbunny_H_64_32.png" width="400px"/>
+				  <figcaption>BUNNY UNIFORM HEMISPHERE</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/bunny_64_32.png" width="400px"/>
+				  <figcaption>BUNNY IMPORTANCE SAMPLING</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		\[L_o = &int;(L_i(x, wi) * f_r(x, wi, wo) * (N &middot; wi) dwi)\]
+		
+		<p>Where \(L_o\) represents the outgoing radiance that we want along the camera ray that we had fired. </p>
 
+		<p>\(L_i\) represents the incoming radiance from the direction of the incident ray wi, and with the integral integrating over the space with respect to wi we calculate the irradiance of a hit position.</p>
+		
+		<p>\(f_r\) represents the BSDF (bidirectional scattering distribution function) that defines the "material" of the surface that we are interacting with, and outputs a ratio of how much radiance from the incident ray is turned into outgoing radiance</p>
+		
+		<p>The final term is the lambert's cosine law term that determines what intensity of shading is emitted, since the light reflected off of a surface is proportional to the cosine of the angle of the surface's normal and the incident ray, or alternatively the dot product between the unit vectors of the surface normal and the incident ray. </p>
+</p>
+		<p>Now this integral that we use in the rendering equation is not closed form and cannot be solved quite easily, so as a result we use a method known as Monte Carlo sampling where we sample randomly to approximate the integral. 
+		</p>
+
+		<p>For our first method, direct illumination via uniform hemisphere sampling, we performed sampling over a hemisphere around our intersection point and randomly sampled directions uniformly over this hemisphere with the goal of approximating the rendering equation integral by adding up the emission values (which are non-zero when intersecting with light sources) and multiplying by our sample "width" = 1/N. Our probability distribution function (p(x)) is uniform in this situation so our probability density function is constant at a 1/(2pi) representing a hemisphere in steridians. 
+				</p>
+			<p>For a second method, we used direct illumination via importance sampling. Importance sampling at a high level uses a different distribution that has useful data to help us better estimate the rendering equation integral, which in this case we use a method of using the direction of lights to better inform which directions an incident ray can arrive at our surface. 
+</p>
+	<p>The difference from the uniform hemisphere sampling was that instead of sampling randomly and uniformly in a hemisphere, we seek to sample more effectively and remove noise from the overall scene by adding the criteria of sampling only from directions towards defined lights in our scene and the ray between the light and point is not obstructed (known as shadow rays to check whether we are obstructed by another primitive in the light). In this method, our probability density function is defined by the sampler we use given the direction of our hit point and the source of the light which helps us estimate our integral more effectively to highlight areas where sampling is more representative of the true integral. 
+</p>
+	</p>
+	<div style="display: flex; flex-direction: column; align-items: center;">
+		<figcaption>IMPORTANCE SAMPLING</figcaption>
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt3_dragon_1_1.png" width="400px"/>
+				  <figcaption>1 LIGHT RAY + 1 SAMPLE PIXEL</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt3_dragon_1_4.png" width="400px"/>
+				  <figcaption>4 LIGHT RAY + 1 SAMPLE PIXEL</figcaption>
+				</td>
+			  </tr>
+			  			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt3_dragon_1_16.png" width="400px"/>
+				  <figcaption>16 LIGHT RAY + 1 SAMPLE PIXEL</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt3_dragon_1_64.png" width="400px"/>
+				  <figcaption>64 LIGHT RAY + 1 SAMPLE PIXEL</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<p>Uniform Hemisphere vs. Importance Sampling Analysis:
+Uniform hemisphere direct illumination compared to importance sampling does have some notable visual differences, namely under the same parameters, the pathtracing for uniform hemisphere sampling results in a subtle but noticeable amount of noise in the rendered image likely due to the higher variance that it experiences from the method of randomly sampling in a hemisphere compared to importance sampling's emphasis on certain areas of a distribution. Additionally, importance sampling also loses the glow on the area light, which is the result of the directionality of the method of importance sampling. Overall importance sampling does result in a clearer, more well defined and less noisy image likely due to its decreased variance from the estimations of its integrals. 
+</p>
 		<h2>Part 4: Global Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
