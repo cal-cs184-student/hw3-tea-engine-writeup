@@ -185,6 +185,49 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 		<h2>Part 4: Global Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_1.png" width="400px"/>
+				  <figcaption>Pixel Rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_2.png" width="400px"/>
+				  <figcaption>Pixel Rate 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_4.png" width="400px"/>
+				  <figcaption>Pixel Rate 4</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_8.png" width="400px"/>
+				  <figcaption>Pixel Rate 8</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_16.png" width="400px"/>
+				  <figcaption>Pixel Rate 16</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_32.png" width="400px"/>
+				  <figcaption>Pixel Rate 32</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_64.png" width="400px"/>
+				  <figcaption>Pixel Rate 64</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_1024.png" width="400px"/>
+				  <figcaption>Pixel Rate 1024</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
 		<h2>Part 5: Adaptive Sampling</h2>
 		Adaptive sampling is a way to reduce the amount of rays needed in order to render a good image. It uses the principle that some pixels can converge very quickly to the correct color, while others might take a lot more samples if they are part of more complex geometry. Thus, it measures the variance of the samples taken so far and terminates the sampling early if it deems that the noise/variance is low enough. Our implementation achieves this by storing a cumulative sum so far (and its square) to be used in the variance calculations. We check the variance using our sums and the formula every samplesPerBatch to avoid having to do these calculations every single color update. We break out of the loop if the desired confidence interval is reached, or we terminate the loop once ns_aa (max number of samples) is reached.
 		<table style="width: 100%; text-align: center; border-collapse: collapse;">
