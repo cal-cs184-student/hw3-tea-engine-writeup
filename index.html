@@ -89,7 +89,22 @@
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		At a high level, the BVH construction algorithm is a recursive algorithm that organizes a defined set of primitives (like triangles) into a binary tree for efficient and fast lookups of what a ray can possibly intersect within the scene.
+<p>
+The binary tree that organizes the primitives has inner nodes and leaf nodes. Each node is a BVHNode that can store its bounding box, a left and right attribute that identifies its children BVHNodes and a start and end iterator that represents the start and end of a vector of primitives that are within that bounding box. 
+</p>
+<p>
+In the binary tree there's inner nodes and leaf nodes, where the inner nodes contain the overall bounding box for its children nodes and a left and right attributes for their respective childrenBVHNodes. The crux of the BVH acceleration algorithm though is in its heuristic to decide how to split a list of primitives. Our initial method was to find the longest axis of the bounding box and select the median element of this axis and divide the primitives into the left and right children BVHNodes so that they would be roughly equal between each other. 
+</p>
+<p>
+The heuristic we split on is the size of the bounding boxes on the largest remaining axis at each stage of the BVH. We choose the axis with the largest extent, then find the leftmost primitive and create a bounding box with the primitive which extends the sub-bounding box to as close to splitting the current box in half in the chosen axis (we also add any primitives contained within to be in the bounding box). 
+</p>
+<p>
+Once the binary tree is formed, an intersect method for the bounding boxes helps us recursively traverse the BVH formed binary tree by determining if a ray firsts hits a node's bounding box and with the base case that stops recursion if the BVHNode is a leaf node. When we hit a leaf node we then check intersections with all the primitives within that bounding box (via iterating through the start and end attributes) and report intersection info and whether the ray successfully hit any primitives. 
+</p>
+<p>
+Our performance comparison shows a massive difference between using and not using BVH. For CBlucy.dae rendering with 10 threads, we went from 775.4139 seconds to render down to a mere 0.0746s. This drastic 1000x speedup makes sense, as we averaged only 1.23 intersection tests per ray using our BVH implementation, as opposed to 17022.73 intersection tests without BVH. Similarly, for CBbench.dae rendered in 0.618 seconds using BVH, and 353.3483 seconds with BVH.
+</p>
 
 		<h2>Part 3: Direct Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
