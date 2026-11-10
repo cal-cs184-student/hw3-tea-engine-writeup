@@ -62,7 +62,6 @@
 
 		To test sphere intersection we follow a similar process with substituting r(t) into the point of an equation describing a sphere. This gives us a quadratic to solve, upon solving we choose the intersection with the smaller t value indicating that it was the one that hit the sphere first.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
@@ -83,6 +82,7 @@
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
+		
 		At a high level, the BVH construction algorithm is a recursive algorithm that organizes a defined set of primitives (like triangles) into a binary tree for efficient and fast lookups of what a ray can possibly intersect within the scene.
 <p>
 The binary tree that organizes the primitives has inner nodes and leaf nodes. Each node is a BVHNode that can store its bounding box, a left and right attribute that identifies its children BVHNodes and a start and end iterator that represents the start and end of a vector of primitives that are within that bounding box. 
@@ -99,7 +99,23 @@ Once the binary tree is formed, an intersect method for the bounding boxes helps
 <p>
 Our performance comparison shows a massive difference between using and not using BVH. For CBlucy.dae rendering with 10 threads, we went from 775.4139 seconds to render down to a mere 0.0746s. This drastic 1000x speedup makes sense, as we averaged only 1.23 intersection tests per ray using our BVH implementation, as opposed to 17022.73 intersection tests without BVH. Similarly, for CBbench.dae rendered in 0.618 seconds using BVH, and 353.3483 seconds with BVH.
 </p>
-
+<div style="display: flex; flex-direction: column; align-items: center;">
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/maxplanck.png" width="400px"/>
+				  <figcaption>MAX PLANCK</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/walle.png" width="400px"/>
+				  <figcaption>walle</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/cow.png" width="400px"/>
+				  <figcaption>LUCY</figcaption>
+				</td>
+			</table>
+</div>
 		<h2>Part 3: Direct Illumination</h2>
 		<p>
 		For this part, we had to implement two different versions of the direct lighting function, specifically uniform hemisphere sampling and importance sampling. Both methods aim to provide path tracing with one bounce illumination by providing shading to a pixel where a camera's ray has intersected a primitive. The method in which we perform this is by tracking inverse rays where we fire the rays from the camera and when they intersect with a primitive we determine its shading via the rendering equation (instead of tracking light coming from the light sources): 
@@ -170,21 +186,30 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 		<h2>Part 5: Adaptive Sampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		Adaptive sampling is a way to reduce the amount of rays needed in order to render a good image. It uses the principle that some pixels can converge very quickly to the correct color, while others might take a lot more samples if they are part of more complex geometry. Thus, it measures the variance of the samples taken so far and terminates the sampling early if it deems that the noise/variance is low enough. Our implementation achieves this by storing a cumulative sum so far (and its square) to be used in the variance calculations. We check the variance using our sums and the formula every samplesPerBatch to avoid having to do these calculations every single color update. We break out of the loop if the desired confidence interval is reached, or we terminate the loop once ns_aa (max number of samples) is reached.
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_blob.png" width="400px"/>
+				  <figcaption>Blob with Adaptive Sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_blob_rate.png" width="400px"/>
+				  <figcaption>Sampling Rate of Blob</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_bench.png" width="400px"/>
+				  <figcaption>Bench with Adaptive Sampling</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt5/pt5_bench_rate.png" width="400px"/>
+				  <figcaption>Sampling Rate of Bench</figcaption>
+				</td>
+			  </tr>
+			</table>
+	
 		</div>
 	</body>
 </html>
