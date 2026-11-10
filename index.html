@@ -83,6 +83,7 @@
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
+		
 		At a high level, the BVH construction algorithm is a recursive algorithm that organizes a defined set of primitives (like triangles) into a binary tree for efficient and fast lookups of what a ray can possibly intersect within the scene.
 <p>
 The binary tree that organizes the primitives has inner nodes and leaf nodes. Each node is a BVHNode that can store its bounding box, a left and right attribute that identifies its children BVHNodes and a start and end iterator that represents the start and end of a vector of primitives that are within that bounding box. 
@@ -99,7 +100,23 @@ Once the binary tree is formed, an intersect method for the bounding boxes helps
 <p>
 Our performance comparison shows a massive difference between using and not using BVH. For CBlucy.dae rendering with 10 threads, we went from 775.4139 seconds to render down to a mere 0.0746s. This drastic 1000x speedup makes sense, as we averaged only 1.23 intersection tests per ray using our BVH implementation, as opposed to 17022.73 intersection tests without BVH. Similarly, for CBbench.dae rendered in 0.618 seconds using BVH, and 353.3483 seconds with BVH.
 </p>
-
+<div style="display: flex; flex-direction: column; align-items: center;">
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/maxplanck.png" width="400px"/>
+				  <figcaption>MAX PLANCK</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/walle.png" width="400px"/>
+				  <figcaption>walle</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/cow.png" width="400px"/>
+				  <figcaption>LUCY</figcaption>
+				</td>
+			</table>
+</div>
 		<h2>Part 3: Direct Illumination</h2>
 		<p>
 		For this part, we had to implement two different versions of the direct lighting function, specifically uniform hemisphere sampling and importance sampling. Both methods aim to provide path tracing with one bounce illumination by providing shading to a pixel where a camera's ray has intersected a primitive. The method in which we perform this is by tracking inverse rays where we fire the rays from the camera and when they intersect with a primitive we determine its shading via the rendering equation (instead of tracking light coming from the light sources): 
