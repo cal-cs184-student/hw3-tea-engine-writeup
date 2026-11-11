@@ -183,46 +183,169 @@ Our performance comparison shows a massive difference between using and not usin
 Uniform hemisphere direct illumination compared to importance sampling does have some notable visual differences, namely under the same parameters, the pathtracing for uniform hemisphere sampling results in a subtle but noticeable amount of noise in the rendered image likely due to the higher variance that it experiences from the method of randomly sampling in a hemisphere compared to importance sampling's emphasis on certain areas of a distribution. Additionally, importance sampling also loses the glow on the area light, which is the result of the directionality of the method of importance sampling. Overall importance sampling does result in a clearer, more well defined and less noisy image likely due to its decreased variance from the estimations of its integrals. 
 </p>
 		<h2>Part 4: Global Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBspheres_s1024.png" width="300px"/>
+				  <figcaption>Global Illumination Spheres</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBdragon_s1024.png" width="300px"/>
+				  <figcaption>Global Illumination Dragon</figcaption>
+				</td>
+				</tr>
+			</table>
+		<p>
+			
+			To achieve indirect lighting we recursively call the function for more than once bounce, decrementing the depth of the ray. Each recursive call adds the one_bounce result to L_out if the accumulating setting is on, or it will keep passing until the very end if the accumulating setting is off. We use the monte carlo formula in the lecture slides to sum and weight each bounce result by the probability distribution function, giving it weight based on how likely that ray is in the distribution.
+		
+		</p>
 
-		<div style="display: flex; flex-direction: column; align-items: center;">
+		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBspheres_direct_1024.png" width="300px"/>
+				  <figcaption>Only Direct Lighting</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBspheres_indirect_1024.png" width="300px"/>
+				  <figcaption>Only Indirect Lighting</figcaption>
+				</td>
+				</tr>
+			</table>
+
+			<div style="display: flex; flex-direction: column; align-items: center;">
+			
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<p><b>Unaccumulated</p></b>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_1.png" width="400px"/>
-				  <figcaption>Pixel Rate 1</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m0.png" width="200px"/>
+				  <figcaption>max_ray_depth = 0</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_2.png" width="400px"/>
-				  <figcaption>Pixel Rate 2</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m1.png" width="200px"/>
+				  <figcaption>max_ray_depth = 1</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_4.png" width="400px"/>
-				  <figcaption>Pixel Rate 4</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m2.png" width="200px"/>
+				  <figcaption>max_ray_depth = 2</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m3.png" width="200px"/>
+				  <figcaption>max_ray_depth = 3</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m4.png" width="200px"/>
+				  <figcaption>max_ray_depth = 4</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_unaccum_m5.png" width="200px"/>
+				  <figcaption>max_ray_depth = 5</figcaption>
+				</td>
+				</tr>
+			  </tr>
+			  </table>
+			  
+			  <p><b>Accumulated</p></b>
+			  <table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m0.png" width="200px"/>
+				  <figcaption>max_ray_depth = 0</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m1.png" width="200px"/>
+				  <figcaption>max_ray_depth = 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m2.png" width="200px"/>
+				  <figcaption>max_ray_depth = 2</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m3.png" width="200px"/>
+				  <figcaption>max_ray_depth = 3</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m4.png" width="200px"/>
+				  <figcaption>max_ray_depth = 4</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_accum_m5.png" width="200px"/>
+				  <figcaption>max_ray_depth = 5</figcaption>
 				</td>
 			  </tr>
-			  <tr>
+			</table>
+			
+
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <p><b>Russian Roulette</p></b>
+				<tr>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_8.png" width="400px"/>
-				  <figcaption>Pixel Rate 8</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m0.png" width="200px"/>
+				  <figcaption>max_ray_depth = 0</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_16.png" width="400px"/>
-				  <figcaption>Pixel Rate 16</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m1.png" width="200px"/>
+				  <figcaption>max_ray_depth = 1</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_32.png" width="400px"/>
-				  <figcaption>Pixel Rate 32</figcaption>
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m2.png" width="200px"/>
+				  <figcaption>max_ray_depth = 2</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m3.png" width="200px"/>
+				  <figcaption>max_ray_depth = 3</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m4.png" width="200px"/>
+				  <figcaption>max_ray_depth = 4</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/pt4-laurier/CBbunny_roulette_m100.png" width="200px"/>
+				  <figcaption>max_ray_depth = 100</figcaption>
 				</td>
 			  </tr>
+			  </table>
+			  <table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_64.png" width="400px"/>
-				  <figcaption>Pixel Rate 64</figcaption>
+				  <img src="assets/jonathans (from reverse)/pt4_last_1.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 1</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/jonathans (from reverse)/pt4_last_1024.png" width="400px"/>
-				  <figcaption>Pixel Rate 1024</figcaption>
+				  <img src="assets/jonathans (from reverse)/pt4_last_2.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_4.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 4</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_8.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 8</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_16.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 16</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_64.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 64</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+				  <img src="assets/jonathans (from reverse)/pt4_last_1024.png" width="300px"/>
+				  <figcaption>Sample per Pixel Rate 1024</figcaption>
 				</td>
 			  </tr>
 			</table>
@@ -252,7 +375,8 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 				</td>
 			  </tr>
 			</table>
-	
+
+			
 		</div>
 	</body>
 </html>
