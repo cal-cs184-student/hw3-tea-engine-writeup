@@ -34,19 +34,34 @@
 
 		Link to webpage: <a href="https://cal-cs184-student.github.io/hw3-tea-engine-writeup/">https://cal-cs184-student.github.io/hw3-tea-engine-writeup/</a>
 		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw3-tea-engine">https://github.com/cal-cs184-student/hw3-tea-engine</a>
-		
-		<figure>
-			<img src="assets/cornell.png" alt="Cornell Boxes with Bunnies" style="width:70%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
 
 		<!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
-
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="assets/walle.png" width="400px"/>
+				  <figcaption>WALL-E</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="assets/CBbunny_H_64_32.png" width="400px"/>
+				  <figcaption>Bunny..</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+		<p>This assignment was fascinating! It's very interesting that path tracing algorithms primarily rely on a sort of egocentric fashion where camera rays from the image plane are fired out and intersect with points in the scene and when those rays intersect they perform lighting requests to know what color that ray should represent through the BSDFs, the irradiance on that position, angle of light, etc. Intuitively and in-reality light originates from light sources and fires out rays which is why this inverse-ray process was particularly interesting. Additionally this project has really opened our eyes to how such intensive processes of rendering and estimating irradiance and radiance throughout a scene really is! The BVH algorithm was a miraculous save on rendering time and it is a very clever method in order to determine what primitive shapes are worth intersecting with in a scene filled with thousands or perhaps millions of triangles. 
+</p>
+<p>A high level overview of what was implemented was first the base of pathtracing: a ray generation and intersection methods for our primitives, specifically triangles and spheres, which enables the rest of the project to perform illumination duties based on the results of rays intersecting and moving around the scene space. Then we implemented the optimization methods of BVH which was a clever method in order to prevent checking a single ray's intersection with all the primitives in the scene and instead allowed us to check only a few primitives by traversing a binary tree constructed by a heuristic BVH split method. After the BVH optimizations, we were enabled to implement 2 different methods of direct illumination to estimate the integral in the rendering equation (via Monte Carlo) in order to calculate the radiance traveling back towards the camera rays on the image plane. The first method was Uniform Hemisphere sampling where we sampled randomly in a range of a hemisphere at an intersection point. The second method was Importance Sampling, which unlike Uniform sampling, adds an additional emphasis on tracking light that is in the direction of known lights in the scene rather than sampling randomly in a hemisphere which creates images with far less noise. 
+</p>
+<p>We then extended our monte carlo pathtracing to do global illumination by adding more bounces to our pathtracing algorithm. Our process uses recursion to add lighting from multiple bounces of the same ray to the final pixel buffer. To optimize speed while improving the image rendering, we also implemented russian roulette to allow for more bounces while not statistically biasing the image to weaker lighting samples. We also used adaptive sampling, which allowed some pixels that converged faster to be sampled less, giving more attention to the pixels that are near complex geometries that have more variance. Overall, the global illumination with the improvements we added (like russian roulette and adaptive sampling) seek to give more accurate and better looking images while minimizing the cost in terms of compute.
+</p>
+<p>Partner paragraph: We collaborated together mainly by having one person do an implementation and a follow-up read/explain to get a mutual understanding of the code alongside collaboration together on the writeup to ensure we caught all the relevant details for the deliverables. For the most part we worked together successfully, although we do wish we started a little bit earlier but at the same time this project was in smack dab in the middle of midterm season. We both learned a lot from this project and were really glad that it was on CS184 this year. Path tracing is a really interesting and exciting modern topic that we will look more into! 
+</p>
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 		Ray generation seeks to transform a normalized location on the camera sensor into a ray in world space going from the origin of the camera through the specified point. It does this with first a transformation matrix that gets the right rotation in world space, then a translation to the origin of the camera in world space. We test for intersection for spheres and triangles
 		To test triangle intersection with a ray, we first find the point where the ray intersects with the plane the triangle is on, which is computed using dot and cross products, the formula is derived by substituting: 
@@ -187,37 +202,38 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="assets/pt4-laurier/CBspheres_s1024.png" width="300px"/>
-				  <figcaption>Global Illumination Spheres</figcaption>
+				  <figcaption>Global Illumination Spheres 1024 Samples Per Pixel</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="assets/pt4-laurier/CBdragon_s1024.png" width="300px"/>
-				  <figcaption>Global Illumination Dragon</figcaption>
+				  <img src="assets/bunny1024.png" width="300px"/>
+				  <figcaption>Global Illumination Bunny 1024 Samples Per Pixel</figcaption>
 				</td>
 				</tr>
 			</table>
 		<p>
 			
-			To achieve indirect lighting we recursively call the function for more than once bounce, decrementing the depth of the ray. Each recursive call adds the one_bounce result to L_out if the accumulating setting is on, or it will keep passing until the very end if the accumulating setting is off. We use the monte carlo formula in the lecture slides to sum and weight each bounce result by the probability distribution function, giving it weight based on how likely that ray is in the distribution.
-		
+			To achieve indirect lighting we recursively call the function for "more than once bounce", decrementing the depth of the ray upon each recursive call. Each recursive call adds the one_bounce result to the total radiance L_out if the accumulating setting is on. If the accumulating setting is off, it won't add anything until the very end. We use the Monte Carlo formula mentioned in lecture and also referred to up above to sum and weight each bounce result by the probability distribution function, giving the ray an appropriate weight based on how much the intersection point reflects light in that specific direction. The indirect lighting adds greater fidelity and more conveyed realism to the renders as more soft shadows are able to be added as a result of more bounces following subsequently after our initial one_bounce calculation that we used for direction illumination (difference shown in the examples below). 
 		</p>
 
 		<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			<p>Renders of Only Direct Lighting vs Indirect Lighting! Direct lighting is the same as our previous implementation of one bounce illumination as the path tracing only resolve one bounce per path, and compared to indirect illumination which skips the first bounce and instead only considers the subsequent recursive bounces, you can see that the indirect lighting is far dampened more subtle as these subsequent bounces carry less energy.</p>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="assets/pt4-laurier/CBspheres_direct_1024.png" width="300px"/>
-				  <figcaption>Only Direct Lighting</figcaption>
+				  <figcaption>Only Direct Lighting with 1024 samples per pixel</figcaption>
 				</td>
 				<td style="text-align: center;">
 				  <img src="assets/pt4-laurier/CBspheres_indirect_1024.png" width="300px"/>
-				  <figcaption>Only Indirect Lighting</figcaption>
+				  <figcaption>Only Indirect Lighting 1024 samples per pixel</figcaption>
 				</td>
 				</tr>
 			</table>
-
-			<div style="display: flex; flex-direction: column; align-items: center;">
 			
+			<div style="display: flex; flex-direction: column; align-items: center;">
+			<p>The 2nd and 3rd bounce of light show the light reflecting off the wall onto the bunny. This is in contrast with previous rasterization techniques which weren't able to capture these multi-bounce light features, since they rely on local vertex based shading algorithms.
+</p>
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-				<p><b>Unaccumulated</p></b>
+				<p><b>Unaccumulated: </b>Here is our path tracer that is unaccumulated! Where each bounce in out global illumination is not accumulated / summed per bounce, and instead as the ray depth increases it shows subsequently darker images since these are paths that are more indirect and thus are "stages" of the path that have bounced and lost energy to the number of ray depth experienced.</p>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="assets/pt4-laurier/CBbunny_unaccum_m0.png" width="200px"/>
@@ -249,7 +265,7 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 			  </tr>
 			  </table>
 			  
-			  <p><b>Accumulated</p></b>
+			  <p><b>Accumulated:</b> this is the accumulated version where each subsequent ray adds onto the outputted radiance back to the camera ray, effectively adding indirect lighting (and thus global illumination) to our pathtracer! This was really exciting since it incorporated what the unaccumulated section was showing at each stage, and as you see as the max ray depth increases, the image becomes better looking and more realistic as light bounces are more accurately simulated!</p>
 			  <table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
@@ -283,7 +299,7 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 			
 
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
-			  <p><b>Russian Roulette</p></b>
+			  <p><b>Russian Roulette:</b> this is a helpful rule that is added to pathtracing to maintain a realistic distribution as you do more bounces by giving each ray a probability of ending its recursion early, this chance in our pathtracer has a 60% of continuing every single bounce. Additionally it can also serve as a way to prevent long and possible infinite (depending on implementation) recursion by stopping rays earlier based on a probability.</p>
 				<tr>
 				<td style="text-align: center;">
 				  <img src="assets/pt4-laurier/CBbunny_roulette_m0.png" width="200px"/>
@@ -314,6 +330,7 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 			  </tr>
 			  </table>
 			  <table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<p>Various sample per pixel rates with our global illumination! As you can see, as the amount of samples per pixel increase, noise and variance is decreased and the resulting image with 1024 samples per pixel has the highest fidelity at of all of the sample rates</p>
 			  <tr>
 				<td style="text-align: center;">
 				  <img src="assets/jonathans (from reverse)/pt4_last_1.png" width="300px"/>
@@ -375,8 +392,8 @@ Uniform hemisphere direct illumination compared to importance sampling does have
 				</td>
 			  </tr>
 			</table>
-
-			
+			<p>AI Acknowledgement: AI was used to help aid some of the conceptual understanding of specifically the rendering equation and how the irradiance, BSDFs, probability density functions all tied together. As well as minimal use in debugging and understanding the relevant code paths and C++ syntax.
+			</p>
 		</div>
 	</body>
 </html>
